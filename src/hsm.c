@@ -20,7 +20,7 @@
 #include <stdbool.h>
 #include <stdio.h>
 
-#include "hsm.h"
+#include "thirdparty/uml_state_machine/src/hsm.h"
 
 /*
  *  --------------------- DEFINITION ---------------------
@@ -68,29 +68,29 @@ state_machine_result_t dispatch_event(state_machine_t* const pState_Machine[]
   // Iterate through all state machines in the array to check if event is pending to dispatch.
   for(uint32_t index = 0; index < quantity;)
   {
-    if(pState_Machine[index]->Event == 0)
+    if(pState_Machine[index]->evt == 0)
     {
       index++;
       continue;
     }
 
-    const state_t* pState = pState_Machine[index]->State;
+    const state_t* pState = pState_Machine[index]->state;
     do
     {
 #if STATE_MACHINE_LOGGER
-      event_logger(index, pState->Id, pState_Machine[index]->Event);
+      event_logger(index, pState->Id, pState_Machine[index]->evt);
 #endif // STATE_MACHINE_LOGGER
         // Call the state handler.
       result = pState->Handler(pState_Machine[index]);
 #if STATE_MACHINE_LOGGER
-      result_logger(pState_Machine[index]->State->Id, result);
+      result_logger(pState_Machine[index]->state->Id, result);
 #endif // STATE_MACHINE_LOGGER
 
       switch(result)
       {
       case EVENT_HANDLED:
         // Clear event, if successfully handled by state handler.
-        pState_Machine[index]->Event = 0;
+        pState_Machine[index]->evt = 0;
 
         // intentional fall through
 
@@ -142,9 +142,9 @@ state_machine_result_t dispatch_event(state_machine_t* const pState_Machine[]
 extern state_machine_result_t switch_state(state_machine_t* const pState_Machine,
                                            const state_t* const pTarget_State)
 {
-  const state_t* const pSource_State = pState_Machine->State;
+  const state_t* const pSource_State = pState_Machine->state;
   bool triggered_to_self = false;
-  pState_Machine->State = pTarget_State;    // Save the target node
+  pState_Machine->state = pTarget_State;    // Save the target node
 
   // Call Exit function before leaving the Source state.
     EXECUTE_HANDLER(pSource_State->Exit, triggered_to_self, pState_Machine);
