@@ -59,7 +59,7 @@ typedef struct hierarchical_state state_t;
 typedef struct finite_state state_t;
 #endif// HIERARCHICAL_STATES
 
-typedef struct state_machine_t state_machine_t;
+typedef struct state_machine_s state_machine_t;
 typedef state_machine_result_t (*state_handler)(state_machine_t * const State);
 typedef void (*state_machine_event_logger)(uint32_t state_machine,
                                            uint32_t state, uint32_t event);
@@ -95,9 +95,9 @@ struct hierarchical_state
 };
 
 //! Abstract state machine structure
-struct state_machine_t
+struct state_machine_s
 {
-  uint32_t        evt;//!< Pending Event for state machine
+  uint32_t        evt;  //!< Pending Event for state machine
   const state_t * state;//!< State of state machine.
 };
 
@@ -111,13 +111,9 @@ extern "C"
 #endif// __cplusplus
 
 extern state_machine_result_t
-dispatch_event(state_machine_t * const pState_Machine[], uint32_t quantity
-#if STATE_MACHINE_LOGGER
-               ,
+dispatch_event(state_machine_t * const pState_Machine[], uint32_t quantity,
                state_machine_event_logger  event_logger,
-               state_machine_result_logger result_logger
-#endif// STATE_MACHINE_LOGGER
-);
+               state_machine_result_logger result_logger);
 
 #if HIERARCHICAL_STATES
 extern state_machine_result_t
