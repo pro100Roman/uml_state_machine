@@ -63,7 +63,8 @@ typedef struct state_machine_s state_machine_t;
 typedef state_machine_result_t (*state_handler)(state_machine_t * const State);
 typedef void (*state_machine_event_logger)(uint32_t state_machine,
                                            uint32_t state, uint32_t event);
-typedef void (*state_machine_result_logger)(uint32_t               state,
+typedef void (*state_machine_result_logger)(uint32_t state_machine,
+                                            uint32_t state,
                                             state_machine_result_t result);
 
 //! finite state structure

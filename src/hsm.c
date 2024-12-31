@@ -84,7 +84,7 @@ state_machine_result_t dispatch_event(state_machine_t * const pState_Machine[],
 
       if (result_logger)
       {
-        result_logger(pState_Machine[index]->state->Id, result);
+        result_logger(index, pState_Machine[index]->state->Id, result);
       }
 
       switch (result)
