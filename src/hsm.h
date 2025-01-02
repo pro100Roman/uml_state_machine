@@ -15,6 +15,9 @@
 #ifndef HSM_H
 #define HSM_H
 
+#include <stdbool.h>
+#include <stdint.h>
+
 #ifdef HSM_CONFIG
   #include "hsm_config.h"
 #endif// HSM_CONFIG
@@ -95,10 +98,16 @@ struct hierarchical_state
   uint32_t              Level; //!< Hierarchy level from the top state.
 };
 
+typedef struct evt_s
+{
+  uint32_t * sig;
+  bool       is_handled;
+} sm_evt_t;
+
 //! Abstract state machine structure
 struct state_machine_s
 {
-  uint32_t        evt;  //!< Pending Event for state machine
+  sm_evt_t        evt;  //!< Pending Event for state machine
   const state_t * state;//!< State of state machine.
 };
 
@@ -123,9 +132,11 @@ traverse_state(state_machine_t * const pState_Machine,
 #endif// HIERARCHICAL_STATES
 
 extern state_machine_result_t
-switch_state(state_machine_t * const pState_Machine,
-             const state_t * const   pTarget_State);
+                       switch_state(state_machine_t * const pState_Machine,
+                                    const state_t * const   pTarget_State);
 
+state_machine_result_t post_event(state_machine_t * const pState_Machine,
+                                  uint32_t *              evt);
 #ifdef __cplusplus
 }
 #endif// __cplusplus

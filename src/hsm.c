@@ -16,8 +16,6 @@
  *  --------------------- INCLUDE FILES ---------------------
  */
 
-#include <stdbool.h>
-#include <stdint.h>
 #include <stdio.h>
 
 #include "thirdparty/uml_state_machine/src/hsm.h"
@@ -66,7 +64,7 @@ state_machine_result_t dispatch_event(state_machine_t * const pState_Machine[],
   // Iterate through all state machines in the array to check if event is pending to dispatch.
   for (uint32_t index = 0; index < quantity;)
   {
-    if (pState_Machine[index]->evt == 0)
+    if (pState_Machine[index]->evt.is_handled == true)
     {
       index++;
       continue;
@@ -77,7 +75,7 @@ state_machine_result_t dispatch_event(state_machine_t * const pState_Machine[],
     {
       if (event_logger)
       {
-        event_logger(index, pState->Id, pState_Machine[index]->evt);
+        event_logger(index, pState->Id, *pState_Machine[index]->evt.sig);
       }
       // Call the state handler.
       result = pState->Handler(pState_Machine[index]);
@@ -91,7 +89,7 @@ state_machine_result_t dispatch_event(state_machine_t * const pState_Machine[],
       {
         case EVENT_HANDLED:
           // Clear event, if successfully handled by state handler.
-          pState_Machine[index]->evt = 0;
+          pState_Machine[index]->evt.is_handled = true;
 
           // intentional fall through
 
@@ -99,8 +97,8 @@ state_machine_result_t dispatch_event(state_machine_t * const pState_Machine[],
           // and posted a new event to itself.
         case TRIGGERED_TO_SELF:
 
-          index =
-            0;// Restart the event dispatcher from the first state machine.
+          index = 0;
+          // Restart the event dispatcher from the first state machine.
           break;
 
 #if HIERARCHICAL_STATES
@@ -252,3 +250,11 @@ state_machine_result_t traverse_state(state_machine_t * const pState_Machine,
   return EVENT_HANDLED;
 }
 #endif// HIERARCHICAL_STATES
+
+state_machine_result_t post_event(state_machine_t * const pState_Machine,
+                                  uint32_t *              evt)
+{
+  pState_Machine->evt.is_handled = false;
+  pState_Machine->evt.sig        = evt;
+  return EVENT_HANDLED;
+}
